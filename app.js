@@ -38,7 +38,6 @@ app.route("/articles")
         });
     })
 
-
     .post(function (req, res) {
         const a = new Article({
             title: req.body.title,
@@ -64,6 +63,69 @@ app.route("/articles")
             }
         })
     });
+
+app.route("/articles/:articleTitle")
+
+    .get(function(req,res){
+        Article.findOne({title : req.params.articleTitle},function(err,foundArticle){
+            if(!err){
+                if(foundArticle){
+                    res.send(foundArticle);
+                }
+                else{
+                    res.send("No article with the given title");
+                }
+            }
+            else{
+                res.send(err);
+            }
+        })
+    })
+
+    .put(function(req,res){
+        Article.updateOne(
+            //condition
+            {title:req.params.articleTitle}, 
+            //Updates the title and content with new(which has been passed)
+            {title : req.body.title, content: req.body.content}, 
+            // {overwrite:true}, No need in updateOne function.
+            function(err){
+                if(!err){
+                    res.send("Successfully updated");
+                }
+                else{
+                    res.send(err);
+                }         
+            }
+        )
+    })  
+
+    .patch(function(req,res){
+        Article.updateOne(
+            {title:req.params.articleTitle}, //condition
+            {$set : req.body},//{title : req.params.title , content: req.params.content}}
+            function(err){
+                if(!err){
+                    res.send("Succesfully Updated ");
+                }
+                else{
+                    res.send(err);
+                }
+            }
+        )
+    })
+
+    .delete(function(req,res){
+        Article.deleteOne({title:req.params.articleTitle},function(err){
+            if(!err){
+                res.send("Deleted Succesfuly");
+            }
+            else{
+                res.send(err);
+            }
+        })
+    });
+
 
 app.listen(port, function () {
     console.log("Server started on port " + port);
